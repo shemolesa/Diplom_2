@@ -40,7 +40,12 @@ class TestCustomer:
         response_authorization = requests.post(URL_CUSTOMER_LOGIN,
                                                headers={'Authorization': response_fixture[1]}, data=payload)
         # проверяем, что замена выполнилась успешно и пользователь с новым паролем может авторизоваться
-        assert response_changing.status_code == 200 and response_authorization.status_code == 200
+        assert ((response_changing.status_code == 200 and response_changing.json()['user']['name'] == payload['name']
+                 and response_changing.json()['user']['email'] == payload['email'])
+                and
+                (response_authorization.status_code == 200 and
+                 response_authorization.json()['user']['name'] == payload['name']
+                 and response_authorization.json()['user']['email'] == payload['email']))
 
 
     @allure.title('проверка одновременного изменения всех данных авторизованного/неавторизованного покупателя')
@@ -55,7 +60,12 @@ class TestCustomer:
         response_authorization = requests.post(URL_CUSTOMER_LOGIN,
                                                headers={'Authorization': response_fixture[1]}, data=new_data)
         # проверяем, что замена данных прошла успешно и покупатель может зарегистироваться
-        assert response_changing.status_code == 200 and response_authorization.status_code == 200
+        assert ((response_changing.status_code == 200 and response_changing.json()['user']['name'] == new_data['name']
+                 and response_changing.json()['user']['email'] == new_data['email'])
+                and
+                (response_authorization.status_code == 200 and
+                 response_authorization.json()['user']['name'] == new_data['name']
+                 and response_authorization.json()['user']['email'] == new_data['email']))
 
     @allure.title('проверка невозможности изменения почты, на уже используемvю у авторизованного/'
                   'неавторизованного покупателя')
@@ -69,8 +79,7 @@ class TestCustomer:
         # меняем пароль у тестового покупателя
         response_changing = requests.patch(URL_CUSTOMER, headers={'Authorization': response_fixture[1]}, json=new_email)
         # удаляем нового покупателя
-        response_delete = requests.delete(URL_CUSTOMER,
-                                          headers={'Authorization': response_registration.json()['accessToken']})
+        requests.delete(URL_CUSTOMER, headers={'Authorization': response_registration.json()['accessToken']})
         # проверяем, что замена не выполнилась
         assert response_changing.status_code == 403 and response_changing.json()['message'] == CHANGE_MESSAGE_403
 

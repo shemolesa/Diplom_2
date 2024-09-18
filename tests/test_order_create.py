@@ -5,7 +5,7 @@ from helpers import generate_ingredient
 from data import GET_ORDERS_MESSAGE_401, MENU_BUNS, MENU_SAUCES, MENU_FILLINGS, URL_ORDERS, CREATE_ORDER_MESSAGE_400
 
 
-class TestOrder():
+class TestOrder:
 
     @allure.title('Проверка успешного создания заказа без авторизации(только булка, булка с начинкой, '
                   'булка с начинкой и соусом)')

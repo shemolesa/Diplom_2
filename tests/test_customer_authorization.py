@@ -29,8 +29,7 @@ class TestCourierAuthorization:
         # авторизуемся с некорректным логином/паролем
         response_authorization = requests.post(URL_CUSTOMER_LOGIN, data=payload_incorrect)
         # удаляем тестового покупателя
-        response_delete = requests.delete(URL_CUSTOMER, data=TEST_CUSTOMER,
-                                          headers={'Authorization': response_registration.json()['accessToken']})
+        requests.delete(URL_CUSTOMER, data=TEST_CUSTOMER, headers={'Authorization': response_registration.json()['accessToken']})
         # проверяем, что авторизация не выполнена
         assert response_authorization.status_code == 401 and response_authorization.json()[
             'message'] == AUTHORIZATION_MESSAGE_INCORRECT_DATA_401

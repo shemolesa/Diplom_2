@@ -1,7 +1,7 @@
 import requests
 import pytest
 import allure
-from helpers import customer_registration,  generate_email, generate_string
+from helpers import generate_email, generate_string, generate_data_customer
 from data import URL_CUSTOMER_REG, REGISTRATION_MESSAGE_403, REGISTRATION_MESSAGE_NOT_ENOUGH_DATA_403, URL_CUSTOMER
 
 
@@ -9,12 +9,13 @@ class TestCustomer:
 
     @allure.title('Проверка успешной регистрации покупателя с полным набором данных')
     def test_registration_customer_complete_data_successfully(self):
-        response_registration = customer_registration() # регистрируем тестового покупателя
-        access_token = response_registration[0].json()['accessToken'] # получаем токен зарегистрированного пользователя
+        payload = generate_data_customer() #генерируем данные покупателя
+        response_registration = requests.post(URL_CUSTOMER_REG, data=payload) # регистрируем тестового покупателя
+        access_token = response_registration.json()['accessToken'] # получаем токен зарегистрированного покупателя
         # удаляем тестового покупателя
-        response_delete = requests.delete(URL_CUSTOMER, headers={'Authorization': access_token})
+        requests.delete(URL_CUSTOMER, headers={'Authorization': access_token})
         # проверяем, что покупатель зарегистрирован
-        assert response_registration[0].status_code == 200 and response_registration[0].json()['success'] == True
+        assert response_registration.status_code == 200 and response_registration.json()['success'] == True
 
     @allure.title('Проверка невозможности регистрации покупателя с повторяющимся логином')
     def test_registration_customer_double_error(self, response_customer_unauthorized):
